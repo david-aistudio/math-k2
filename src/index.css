@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Claude-inspired dark theme */
+    --background: 220 13% 9%;
+    --foreground: 220 15% 85%;
+    --card: 220 13% 11%;
+    --card-foreground: 220 15% 85%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 220 15% 85%;
+    --primary: 15 100% 65%;
+    --primary-foreground: 220 13% 9%;
+    --primary-glow: 25 100% 70%;
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 220 15% 85%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 15% 60%;
+    --accent: 220 13% 15%;
+    --accent-foreground: 220 15% 85%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 15% 85%;
+    --border: 220 13% 18%;
+    --input: 220 13% 15%;
+    --ring: 15 100% 65%;
+    --radius: 0.75rem;
+    
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(15 100% 65%), hsl(25 100% 70%));
+    --gradient-bg: linear-gradient(180deg, hsl(220 13% 9%), hsl(220 13% 7%));
+    --gradient-card: linear-gradient(135deg, hsl(220 13% 11%), hsl(220 13% 13%));
+    
+    /* Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(220 13% 5% / 0.4);
+    --shadow-glow: 0 0 40px hsl(15 100% 65% / 0.2);
+    --shadow-message: 0 4px 20px -4px hsl(220 13% 5% / 0.3);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 220 13% 11%;
+    --sidebar-foreground: 220 15% 60%;
+    --sidebar-primary: 15 100% 65%;
+    --sidebar-primary-foreground: 220 13% 9%;
+    --sidebar-accent: 220 13% 15%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-ring: 15 100% 65%;
+  }
+
+  .dark {
+    --background: 220 13% 9%;
+    --foreground: 220 15% 85%;
+    --card: 220 13% 11%;
+    --card-foreground: 220 15% 85%;
+    --popover: 220 13% 11%;
+    --popover-foreground: 220 15% 85%;
+    --primary: 15 100% 65%;
+    --primary-foreground: 220 13% 9%;
+    --secondary: 220 13% 15%;
+    --secondary-foreground: 220 15% 85%;
+    --muted: 220 13% 15%;
+    --muted-foreground: 220 15% 60%;
+    --accent: 220 13% 15%;
+    --accent-foreground: 220 15% 85%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 15% 85%;
+    --border: 220 13% 18%;
+    --input: 220 13% 15%;
+    --ring: 15 100% 65%;
+
+    --sidebar-background: 220 13% 11%;
+    --sidebar-foreground: 220 15% 60%;
+    --sidebar-primary: 15 100% 65%;
+    --sidebar-primary-foreground: 220 13% 9%;
+    --sidebar-accent: 220 13% 15%;
+    --sidebar-accent-foreground: 220 15% 85%;
+    --sidebar-border: 220 13% 18%;
+    --sidebar-ring: 15 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .claude-gradient {
+    background: var(--gradient-bg);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+  }
+  
+  .elegant-shadow {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .glow-shadow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .message-shadow {
+    box-shadow: var(--shadow-message);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+  
+  .transition-fast {
+    transition: var(--transition-fast);
+  }
+
+  /* Professional typing animation */
+  .typing-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background-color: hsl(var(--primary));
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: typing-pulse 1.5s infinite;
+  }
+  
+  .typing-dot:nth-child(1) { animation-delay: 0s; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  
+  @keyframes typing-pulse {
+    0%, 60%, 100% { opacity: 0.4; transform: scale(1); }
+    30% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* Math formula styling */
+  .math-formula {
+    font-family: 'Computer Modern', 'Latin Modern Math', serif;
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
+    border-radius: 8px;
+    padding: 12px;
+    margin: 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+  
+  .step-container {
+    background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
+    border-left: 3px solid hsl(var(--primary));
+    border-radius: 0 8px 8px 0;
+    transition: var(--transition-smooth);
+  }
+  
+  .step-container:hover {
+    background: linear-gradient(135deg, hsl(var(--muted)), hsl(var(--accent)));
+    border-left-color: hsl(var(--primary-glow));
+    transform: translateX(2px);
+  }
+
+  /* Fade in animation */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+}
