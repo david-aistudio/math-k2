@@ -33,7 +33,7 @@ export class MathEngine {
       return envKey.split(',').map(key => key.trim());
     }
     
-    // Fallback to demo keys if no env key provided
+    // Fallback to demo keys if no env key provided - use same keys as aiConfig.ts
     console.log('Using demo API keys');
     return [
       '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',

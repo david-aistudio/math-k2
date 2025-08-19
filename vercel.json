@@ -20,5 +20,10 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "VITE_OPENROUTER_API_KEY": "$VITE_OPENROUTER_API_KEY"
+    }
+  }
 }
