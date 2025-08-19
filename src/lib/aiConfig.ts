@@ -16,26 +16,10 @@ export const AI_CONFIG = {
     }
   },
 
-  // API Keys Rotation - ambil dari environment variables atau fallback ke demo keys
-  API_KEYS: (() => {
-    const envKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    if (envKey) {
-      console.log('Using API keys from environment');
-      return envKey.split(',').map(key => key.trim());
-    }
-    // Fallback ke demo keys jika tidak ada env key
-    console.log('Using hardcoded demo keys');
-    return [
-      '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',
-      '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',
-      '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',
-      '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',
-      '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',
-      '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',
-      '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',
-      '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'
-    ];
-  })(),
+  // API Keys Rotation - HARDCODED dengan API key yang baru
+  API_KEYS: [
+    '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'
+  ],
 
   // Request Headers
   HEADERS: {
