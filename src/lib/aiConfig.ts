@@ -16,9 +16,9 @@ export const AI_CONFIG = {
     }
   },
 
-  // API Keys Rotation - HARDCODED dengan API key yang baru
+  // API Keys Rotation - HARDCODED dengan API key yang bener
   API_KEYS: [
-    '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'
+    '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'
   ],
 
   // Request Headers

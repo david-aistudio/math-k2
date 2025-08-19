@@ -7,7 +7,7 @@ export class EnhancedMathEngine {
     // Use single API key for production
     console.log('Using single hardcoded API key');
     return [
-      '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'
+      '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'
     ];
   }
 
