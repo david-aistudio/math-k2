@@ -2,18 +2,25 @@
 import { MathSolution, MathStep } from './mathEngine';
 
 export class EnhancedMathEngine {
-  // GET API KEY FROM ENVIRONMENT OR USE DEMO KEYS
-  private static getApiKey(): string {
+  // GET API KEYS FROM ENVIRONMENT OR USE DEMO KEYS
+  private static getApiKeys(): string[] {
     // Check for VITE_OPENROUTER_API_KEY environment variable first
     const envKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     if (envKey) {
-      console.log('Using API key from environment');
-      return envKey;
+      // If single key provided, use it
+      if (!envKey.includes(',')) {
+        console.log('Using single API key from environment');
+        return [envKey];
+      }
+      
+      // If multiple keys provided (comma separated), use all
+      console.log('Using multiple API keys from environment');
+      return envKey.split(',').map(key => key.trim());
     }
     
     // Fallback to demo keys if no env key provided
     console.log('Using demo API keys');
-    const demoKeys = [
+    return [
       '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',
       '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',
       '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',
@@ -23,10 +30,16 @@ export class EnhancedMathEngine {
       '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',
       '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'
     ];
-    
-    // Simple rotation through demo keys
-    const randomIndex = Math.floor(Math.random() * demoKeys.length);
-    return demoKeys[randomIndex];
+  }
+
+  private static currentKeyIndex = 0;
+
+  // GET NEXT API KEY FOR ROTATION
+  private static getNextApiKey(): string {
+    const keys = this.getApiKeys();
+    const key = keys[this.currentKeyIndex];
+    this.currentKeyIndex = (this.currentKeyIndex + 1) % keys.length;
+    return key;
   }
 
   // PROFESSIONAL AI MATH SOLVER
@@ -94,7 +107,7 @@ export class EnhancedMathEngine {
 
   // PROFESSIONAL AI MATH SOLVER
   private static async aiMathSolver(input: string): Promise<MathSolution> {
-    const apiKey = this.getApiKey();
+    const apiKey = this.getNextApiKey();
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',

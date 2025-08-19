@@ -17,18 +17,25 @@ export interface MathSolution {
 }
 
 export class MathEngine {
-  // GET API KEY FROM ENVIRONMENT OR USE DEMO KEYS
-  private static getApiKey(): string {
+  // GET API KEYS FROM ENVIRONMENT OR USE DEMO KEYS
+  private static getApiKeys(): string[] {
     // Check for VITE_OPENROUTER_API_KEY environment variable first
     const envKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     if (envKey) {
-      console.log('Using API key from environment');
-      return envKey;
+      // If single key provided, use it
+      if (!envKey.includes(',')) {
+        console.log('Using single API key from environment');
+        return [envKey];
+      }
+      
+      // If multiple keys provided (comma separated), use all
+      console.log('Using multiple API keys from environment');
+      return envKey.split(',').map(key => key.trim());
     }
     
     // Fallback to demo keys if no env key provided
     console.log('Using demo API keys');
-    const demoKeys = [
+    return [
       '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',
       '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',
       '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',
@@ -38,15 +45,21 @@ export class MathEngine {
       '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',
       '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'
     ];
-    
-    // Simple rotation through demo keys
-    const randomIndex = Math.floor(Math.random() * demoKeys.length);
-    return demoKeys[randomIndex];
+  }
+
+  private static currentKeyIndex = 0;
+
+  // GET NEXT API KEY FOR ROTATION
+  private static getNextApiKey(): string {
+    const keys = this.getApiKeys();
+    const key = keys[this.currentKeyIndex];
+    this.currentKeyIndex = (this.currentKeyIndex + 1) % keys.length;
+    return key;
   }
 
   // AI VISION FOR IMAGE ANALYSIS 📸
   private static async aiVisionSolver(input: string, imageFile: File): Promise<MathSolution> {
-    const apiKey = this.getApiKey();
+    const apiKey = this.getNextApiKey();
     
     try {
       // Convert image to base64
@@ -132,7 +145,7 @@ FORMAT JAWABAN WAJIB JSON dengan struktur yang benar!`
       });
 
       if (!response.ok) {
-        throw new Error(\`Vision API Error: \${response.status}\`);
+        throw new Error(`Vision API Error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -143,8 +156,8 @@ FORMAT JAWABAN WAJIB JSON dengan struktur yang benar!`
       }
 
       // Parse JSON response dengan error handling yang lebih robust
-      const jsonMatch = aiResponse.match(/\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\`/) || 
-                       aiResponse.match(/\\{[\\s\\S]*\\}/);
+      const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || 
+                       aiResponse.match(/\{[\s\S]*\}/);
       
       if (jsonMatch) {
         const cleanResponse = jsonMatch[1] || jsonMatch[0];
@@ -208,7 +221,7 @@ FORMAT JAWABAN WAJIB JSON dengan struktur yang benar!`
 
   // AI-POWERED MATH SOLVER USING OPENROUTER
   private static async aiMathSolver(input: string): Promise<MathSolution> {
-    const apiKey = this.getApiKey();
+    const apiKey = this.getNextApiKey();
     
     try {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -282,7 +295,7 @@ PRINSIP KERJA:
       });
 
       if (!response.ok) {
-        throw new Error(\`API Error: \${response.status}\`);
+        throw new Error(`API Error: ${response.status}`);
       }
 
       const data = await response.json();
@@ -299,8 +312,8 @@ PRINSIP KERJA:
       // Enhanced response handling dengan validasi yang lebih robust
       try {
         // Check if response contains JSON (math problem)
-        const jsonMatch = aiResponse.match(/\\\`\\\`\\\`json\\s*([\\s\\S]*?)\\s*\\\`\\\`\\\`/) || 
-                         aiResponse.match(/\\{[\\s\\S]*\\}/);
+        const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || 
+                         aiResponse.match(/\{[\s\S]*\}/);
         
         if (jsonMatch) {
           // It's a math solution
@@ -406,21 +419,21 @@ PRINSIP KERJA:
   private static isMathematicalInput(input: string): boolean {
     const mathPatterns = [
       // Numbers and basic operations
-      /\\d[\\s+\\-*/^()\\d\\s]*\\d/,
+      /\d[\s+\-*/^()\d\s]*\d/,
       // Variables and equations
-      /[a-zA-Z]\\s*[=+\\-]|[=+\\-]\\s*[a-zA-Z]/,
+      /[a-zA-Z]\s*[=+\-]|[=+\-]\s*[a-zA-Z]/,
       // Mathematical functions
-      /\\b(sin|cos|tan|sec|csc|cot|log|ln|sqrt|exp)\\b/i,
+      /\b(sin|cos|tan|sec|csc|cot|log|ln|sqrt|exp)\b/i,
       // Calculus notation
-      /\\b(derivative|turunan|integral|∫|d\\/dx|lim|limit)\\b/i,
+      /\b(derivative|turunan|integral|∫|d\/dx|lim|limit)\b/i,
       // Physics terms
-      /\\b(vektor|gaya|resultan|komponen|newton|joule|watt|kg|m\\/s)\\b/i,
+      /\b(vektor|gaya|resultan|komponen|newton|joule|watt|kg|m\/s)\b/i,
       // Mathematical keywords
-      /\\b(hitung|berapa|selesaikan|tentukan|carilah|persamaan|fungsi)\\b/i,
+      /\b(hitung|berapa|selesaikan|tentukan|carilah|persamaan|fungsi)\b/i,
       // Mathematical symbols
       /[²³√∫∂πθαβγδ]/,
       // LaTeX-like notation
-      /\\\\[a-zA-Z]+/
+      /\\[a-zA-Z]+/
     ];
     
     return mathPatterns.some(pattern => pattern.test(input));
@@ -428,10 +441,10 @@ PRINSIP KERJA:
 
   // Enhanced type determination
   private static determineTypeFromInput(input: string): MathSolution['type'] {
-    if (/\\b(derivative|turunan|d\\/dx)\\b/i.test(input)) return 'calculus';
-    if (/\\b(integral|∫|antiturunan)\\b/i.test(input)) return 'calculus';
-    if (/\\b(sin|cos|tan|sec|csc|cot)\\b/i.test(input)) return 'trigonometry';
-    if (/\\b(vektor|gaya|resultan|komponen|newton)\\b/i.test(input)) return 'geometry';
+    if (/\b(derivative|turunan|d\/dx)\b/i.test(input)) return 'calculus';
+    if (/\b(integral|∫|antiturunan)\b/i.test(input)) return 'calculus';
+    if (/\b(sin|cos|tan|sec|csc|cot)\b/i.test(input)) return 'trigonometry';
+    if (/\b(vektor|gaya|resultan|komponen|newton)\b/i.test(input)) return 'geometry';
     if (input.includes('=') && /[a-zA-Z]/.test(input)) return 'algebra';
     if (/[a-zA-Z]/.test(input)) return 'algebra';
     return 'arithmetic';
@@ -473,10 +486,10 @@ PRINSIP KERJA:
     }
 
     // Quick check for simple arithmetic
-    const simplePattern = /^[0-9+\\-*/.() ]+$/;
-    if (simplePattern.test(input.replace(/\\s/g, ''))) {
+    const simplePattern = /^[0-9+\-*/.() ]+$/;
+    if (simplePattern.test(input.replace(/\s/g, ''))) {
       try {
-        const result = Function('"use strict"; return (' + input.replace(/\\s/g, '') + ')')();
+        const result = Function('"use strict"; return (' + input.replace(/\s/g, '') + ')')();
         return {
           originalExpression: input,
           finalAnswer: result.toString(),
@@ -486,7 +499,7 @@ PRINSIP KERJA:
               explanation: 'Soal yang diberikan'
             },
             {
-              step: \` = \${result}\`,
+              step: `= ${result}`,
               explanation: 'Hasil perhitungan',
               result: result.toString()
             }
@@ -510,40 +523,40 @@ PRINSIP KERJA:
   // 🧠 ENHANCED PATTERN DETECTION - Deteksi SEMUA jenis soal matematika
   private static isAdvancedMath(input: string): boolean {
     // ALWAYS use advanced engine for equations with variables
-    if (/[a-zA-Z]\\s*[=+\\-]|[=+\\-]\\s*[a-zA-Z]/.test(input)) {
+    if (/[a-zA-Z]\s*[=+\-]|[=+\-]\s*[a-zA-Z]/.test(input)) {
       console.log('🎯 Detected equation with variables, using advanced engine');
       return true;
     }
 
     // ALWAYS use advanced engine if contains "berapa x" or similar variable questions
-    if (/berapa\\s+[a-zA-Z]|[a-zA-Z]\\s*\\?/.test(input)) {
+    if (/berapa\s+[a-zA-Z]|[a-zA-Z]\s*\?/.test(input)) {
       console.log('🎯 Detected variable question, using advanced engine');
       return true;
     }
 
     const advancedPatterns = [
-      /\\b(derivative|turunan|d\\/dx)\\b/i,
-      /\\b(integral|∫|antiturunan)\\b/i,
-      /\\^[2-9]|\\*\\*[2-9]/, // Higher powers
-      /\\b(sin|cos|tan|sec|csc|cot|asin|acos|atan|log|ln|sqrt)\\b/i, // All trig functions
+      /\b(derivative|turunan|d\/dx)\b/i,
+      /\b(integral|∫|antiturunan)\b/i,
+      /\^[2-9]|\*\*[2-9]/, // Higher powers
+      /\b(sin|cos|tan|sec|csc|cot|asin|acos|atan|log|ln|sqrt)\b/i, // All trig functions
       /[α-ωΑ-Ω]/, // Greek letters
-      /\\\\[a-zA-Z]+/, // LaTeX commands
+      /\\[a-zA-Z]+/, // LaTeX commands
       /derajat|°/i, // Degree symbols
-      /\\b(vektor|gaya|resultan|komponen|newton|N\\b|joule|watt|kg|m\\/s)\\b/i, // Physics terms
-      /\\+.*sin|cos.*\\+|sin.*cos/, // Multiple trig functions
-      /f\\(x\\)\\s*=/i, // Function definitions
-      /[a-z]\\^[0-9]/i, // Variables with powers
-      /\\b(limit|lim)\\b/i, // Calculus limits
-      /\\b(matrix|determinan|eigen)\\b/i, // Linear algebra
-      /\\b(probabilitas|permutasi|kombinasi)\\b/i, // Statistics
-      /\\b(geometri|lingkaran|segitiga|persegi)\\b/i, // Geometry
+      /\b(vektor|gaya|resultan|komponen|newton|N\b|joule|watt|kg|m\/s)\b/i, // Physics terms
+      /\+.*sin|cos.*\+|sin.*cos/, // Multiple trig functions
+      /f\(x\)\s*=/i, // Function definitions
+      /[a-z]\^[0-9]/i, // Variables with powers
+      /\b(limit|lim)\b/i, // Calculus limits
+      /\b(matrix|determinan|eigen)\b/i, // Linear algebra
+      /\b(probabilitas|permutasi|kombinasi)\b/i, // Statistics
+      /\b(geometri|lingkaran|segitiga|persegi)\b/i, // Geometry
     ];
     
     // If contains complex mathematical expressions, use advanced engine
     const hasComplexMath = advancedPatterns.some(pattern => pattern.test(input));
     
     // Also check if it's more than simple arithmetic
-    const isSimpleArithmetic = /^[0-9+\\-*/.() ]+$/.test(input.replace(/\\s/g, ''));
+    const isSimpleArithmetic = /^[0-9+\-*/.() ]+$/.test(input.replace(/\s/g, ''));
     
     return hasComplexMath || !isSimpleArithmetic;
   }
@@ -553,7 +566,7 @@ PRINSIP KERJA:
     return input.includes('x') && 
            !input.includes('berapa') && 
            !input.includes('hitung') &&
-           (input.includes('=') || /\\b(sin|cos|tan|x\\^|x\\*)\\b/i.test(input));
+           (input.includes('=') || /\b(sin|cos|tan|x\^|x\*)\b/i.test(input));
   }
 
   // Get helpful examples in Indonesian focusing on mathematics
